@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant Menu</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ultra&amp;family=League+Spartan:wght@400;600;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    .menu-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .menu-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .menu-card-image {
+      width: 100%;
+      height: 80%;
+      background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      color: #999;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .menu-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .category-header {
+      cursor: pointer;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      margin-bottom: 12px;
+    }
+    
+    .category-header:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+    
+    .category-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-out;
+    }
+    
+    .category-content.open {
+      max-height: 10000px;
+      transition: max-height 0.6s ease-in;
+    }
+    
+    .dropdown-arrow {
+      transition: transform 0.3s ease;
+      display: inline-block;
+    }
+    
+    .dropdown-arrow.open {
+      transform: rotate(180deg);
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full"><!-- BACKGROUND IMAGE PLACEHOLDER -->
+  <div id="background-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
+    <img src="images/background.JPG" alt="Background" id="background-img" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';">
+  </div>
+  <div id="app" class="w-full h-full overflow-auto"></div>
+  <script>
+    const defaultConfig = {
+      restaurant_name: "Greenhouse 22",
+      tagline: "Fishing Station & Restaurant",
+      background_image: "images/background.jpg",
+      card_color: "#ffffff",
+      primary_color: "#2d6a4f",
+      accent_color: "#52b788",
+      text_color: "#1b263b",
+      font_family: "League Spartan",
+      font_size: 16
+    };
+
+    const menuData = {
+      'Tilapia': [
+        { name: 'Grilled Tilapia Meal', price: 195 },
+        { name: 'Deep Fried Tilapia Meal', price: 195 },
+        { name: 'Kinilaw na Tilapia', price: 249, options: ['Sinigang', 'Tinola'] },
+        { name: 'Sizzling Tilapia', price: 259 },
+        { name: 'Tilapia Paksiw', price: 249 },
+        { name: 'Tilapia Sinigang', price: 249 },
+        { name: 'Tilapia Tinola', price: 249 }
+      ],
+      'Tuna': [
+        { name: 'Deep Fried Tuna Steak', price: 395 },
+        { name: 'Grilled Tuna Steak', price: 395 },
+        { name: 'Kinilaw na Bariles', price: 279, options: ['Binisaya', 'Dressing'] },
+        { name: 'Sinuglaw', price: 495 },
+        { name: 'Sinigang na Bariles', price: 395 },
+        { name: 'Tinolang Bariles', price: 395 }
+      ],
+      'Squid': [
+        { name: 'Adobong Pusit', price: 395 },
+        { name: 'Calamares', price: 395 },
+        { name: 'Crispy Squid Flower', price: 395 },
+        { name: 'Deep Fried Squid', price: 395 },
+        { name: 'Grilled Squid', price: 395 },
+        { name: 'Sizzling Squid', price: 395 },
+        { name: 'Squid Fries', price: 395 }
+      ],
+      'Shrimp': [
+        { name: 'Camaron Rebosado', price: 295, familySize: 595 },
+        { name: 'Deep Fried Shrimps', price: 295, familySize: 595 },
+        { name: 'Shrimp in Butter Garlic Sauce', price: 295, familySize: 595 },
+        { name: 'Shrimp in Garlic Sauce', price: 295, familySize: 595 },
+        { name: 'Shrimp in Greenhouse 22 Sauce', price: 295, familySize: 595 },
+        { name: 'Sinigang Hipon', price: 295 },
+        { name: 'Tinolang Hipon', price: 295 },
+        { name: 'Shrimp Kare-Kare', price: 595 }
+      ],
+      'Shells': [
+        { name: 'Sizzling Shells', price: 275 },
+        { name: 'Sinigang Shells', price: 275 },
+        { name: 'Tinolang Shells', price: 275 },
+        { name: 'Steamed Shells', price: 275 }
+      ],
+      'Chicken': [
+        { name: 'Grilled Chicken Meal', price: 225 },
+        { name: 'Batter Fried Chicken', price: 375 },
+        { name: 'Fried Chicken', price: 375 },
+        { name: 'Sizzling Chicken', price: 375 },
+        { name: 'Chicken Wings BBQ Platter', price: 495 },
+        { name: 'Satay Platter', price: 895 }
+      ],
+      'Native Chicken': [
+        { name: 'Adobong Manok', price: 425 },
+        { name: 'Piniritong Manok', price: 425 },
+        { name: 'Tinolang Manok', price: 425 }
+      ],
+      'Pork': [
+        { name: 'Deep Fried Pork Chop Meal', price: 235 },
+        { name: 'Grilled Pork Belly Meal', price: 235 },
+        { name: 'Grilled Pork Chop Meal', price: 235 },
+        { name: 'Binagoongang Baboy', price: 395 },
+        { name: 'Binitsuelasang Baboy', price: 425, description: 'Pata with White Beans' },
+        { name: 'Crispy Pata', price: 695 },
+        { name: 'Lechon Kawali', price: 395 },
+        { name: 'Sinigang Baboy', price: 395 },
+        { name: 'Sizzling Pork Chop', price: 335 },
+        { name: 'Sizzling Sisig', price: 295 },
+        { name: 'Sizzling Sisig with Egg', price: 395 },
+        { name: 'Pork Kare-Kare', price: 595 },
+        { name: 'Pork BBQ Platter', price: 495 }
+      ],
+      'Beef': [
+        { name: 'Beef Tapa', price: 325 },
+        { name: 'Sizzling Beef Steak', price: 325 },
+        { name: 'Sizzling Tenderloin', price: 325 }
+      ],
+      'Rice & Noodles': [
+        { name: 'Plain Rice', price: 39 },
+        { name: 'Plain Rice Platter', price: 179 },
+        { name: 'Garlic Fried Rice', price: 49 },
+        { name: 'Garlic Fried Rice Platter', price: 225 },
+        { name: 'Pancit Guisado', price: 315, options: ['Chicken', 'Pork'] },
+        { name: 'Lomi', price: 315, options: ['Chicken', 'Pork'] },
+        { name: 'Sotanghon', price: 315 }
+      ],
+      'All Day Breakfast': [
+        { name: 'Longganisa Rice Bowl', price: 195 },
+        { name: 'Beef Tapa Rice Bowl', price: 195 },
+        { name: 'Hungarian Rice Bowl', price: 195 }
+      ],
+      'Appetizer': [
+        { name: 'Sweet Fried Dilis', price: 195 }
+      ],
+      'Vegetable and Healthy Options': [
+        { name: 'Camote Fries', price: 125 },
+        { name: 'Banana Fries', price: 125 },
+        { name: 'Fried Banana', price: 125 },
+        { name: 'Fried Kangkong', price: 185 },
+        { name: 'Tortang Talong', price: 185 },
+        { name: 'Ensaladang Talong', price: 185 },
+        { name: 'Guisadong Kangkong', price: 185 },
+        { name: 'Steamed Kangkong', price: 185 },
+        { name: 'Cucumber Salad', price: 185 },
+        { name: 'Lumpiang Gulay', price: 195 },
+        { name: 'Sizzling Shiitake Mushrooms', price: 225 },
+        { name: 'Chopsuey', price: 315 },
+        { name: 'Vegetable Kare-Kare', price: 395 }
+      ]
+    };
+
+    const beveragesData = {
+      'Sodas': [
+        { name: 'Pepsi', price: 40 },
+        { name: '7-up', price: 40 },
+        { name: 'Cali', price: 75, description: 'In a can' }
+      ],
+      'Fruit Sodas': [
+        { name: 'Mango Surprise', price: 125 },
+        { name: 'Raspberry Wonder', price: 125 },
+        { name: 'Peach Sparkle', price: 125 }
+      ],
+      'Juices': [
+        { name: 'Calamansi', price: 85 },
+        { name: 'Mango', price: 85 },
+        { name: 'Pineapple Orange', price: 85 },
+        { name: 'Fresh Buko', price: 85 },
+        { name: 'Buko Juice in Glass', price: 85 }
+      ],
+      'Fruit Tea': [
+        { name: 'Mango Sunrise', price: 125 },
+        { name: 'Raspberry Sunset', price: 125 },
+        { name: 'Peach Twilight', price: 125 }
+      ],
+      'Hot Tea': [
+        { name: 'Chamomile Flowers', price: 120 },
+        { name: 'Ceylon Breakfast', price: 120 },
+        { name: 'Early Grey w/ Vanilla', price: 120 },
+        { name: 'English Breakfast', price: 120 },
+        { name: 'Lemon & Ginger', price: 120 },
+        { name: 'Oolong Tea with Peach', price: 120 },
+        { name: 'Pure Green Tea', price: 120 },
+        { name: 'Strawberry and Mango', price: 120 }
+      ],
+      'Greenhouse Iced Tea': [
+        { name: 'Glass', price: 95 },
+        { name: 'Pitcher', price: 295 }
+      ],
+      'Fresh Cucumber Lemonade': [
+        { name: 'Glass', price: 95 },
+        { name: 'Pitcher', price: 295 }
+      ],
+      'Shakes': [
+        { name: 'Mango Shake', price: 105 },
+        { name: 'Buko Shake', price: 105 },
+        { name: 'Papaya Shake', price: 105 },
+        { name: 'Avocado Shake', price: 105 }
+      ],
+      'Beer': [
+        { name: 'San Miguel Flavored', price: 125 }
+      ]
+    };
+
+    let openCategories = {};
+    let currentSlide = 0;
+    let carouselInterval;
+
+    function initializeApp() {
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            render();
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || defaultConfig.background_color,
+                set: (value) => {
+                  config.background_color = value;
+                  window.elementSdk.setConfig({ background_color: value });
+                }
+              },
+              {
+                get: () => config.card_color || defaultConfig.card_color,
+                set: (value) => {
+                  config.card_color = value;
+                  window.elementSdk.setConfig({ card_color: value });
+                }
+              },
+              {
+                get: () => config.primary_color || defaultConfig.primary_color,
+                set: (value) => {
+                  config.primary_color = value;
+                  window.elementSdk.setConfig({ primary_color: value });
+                }
+              },
+              {
+                get: () => config.accent_color || defaultConfig.accent_color,
+                set: (value) => {
+                  config.accent_color = value;
+                  window.elementSdk.setConfig({ accent_color: value });
+                }
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (value) => {
+                  config.text_color = value;
+                  window.elementSdk.setConfig({ text_color: value });
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: {
+              get: () => config.font_family || defaultConfig.font_family,
+              set: (value) => {
+                config.font_family = value;
+                window.elementSdk.setConfig({ font_family: value });
+              }
+            },
+            fontSizeable: {
+              get: () => config.font_size || defaultConfig.font_size,
+              set: (value) => {
+                config.font_size = value;
+                window.elementSdk.setConfig({ font_size: value });
+              }
+            }
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ['restaurant_name', config.restaurant_name || defaultConfig.restaurant_name],
+            ['tagline', config.tagline || defaultConfig.tagline]
+          ])
+        });
+      }
+      
+      render();
+    }
+
+    function getConfig() {
+      return window.elementSdk?.config || defaultConfig;
+    }
+
+    function toggleCategory(categoryId) {
+      openCategories[categoryId] = !openCategories[categoryId];
+      
+      const content = document.getElementById(`content-${categoryId}`);
+      const arrow = document.getElementById(`arrow-${categoryId}`);
+      
+      if (content && arrow) {
+        if (openCategories[categoryId]) {
+          content.classList.add('open');
+          arrow.classList.add('open');
+        } else {
+          content.classList.remove('open');
+          arrow.classList.remove('open');
+        }
+      }
+    }
+
+    window.toggleCategory = toggleCategory;
+
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % 5;
+      updateCarousel();
+      resetCarouselInterval();
+    }
+
+    function prevSlide() {
+      currentSlide = (currentSlide - 1) % 5;
+      updateCarousel();
+      resetCarouselInterval();
+    }
+
+    function updateCarousel() {
+      const carousel = document.getElementById('carousel-track');
+      if (carousel) {
+        carousel.style.transform = `translateX(-${currentSlide * 20}%)`;
+      }
+    }
+
+    function startCarousel() {
+      resetCarouselInterval();
+    }
+
+    window.nextSlide = nextSlide;
+    window.prevSlide = prevSlide;
+
+    function render() {
+      const config = getConfig();
+      const app = document.getElementById('app');
+      
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseFontStack = 'sans-serif';
+      const fontSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      
+      app.style.fontFamily = `${customFont}, ${baseFontStack}`;
+      app.style.backgroundColor = bgColor;
+      
+      app.innerHTML = `
+        <div class="w-full min-h-full p-6 md:p-12">
+          <div class="max-w-7xl mx-auto">
+            ${renderHeader(config, fontSize)}
+            ${renderCarousel(config, fontSize)}
+            ${renderMainCategories(config, fontSize)}
+            ${renderBeverages(config, fontSize)}
+            ${renderFeedbackSection(config, fontSize)}
+          </div>
+        </div>
+      `;
+      
+      // Start carousel after render
+      setTimeout(startCarousel, 100);
+    }
+
+    function renderCarousel(config, fontSize) {
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      
+      return `
+        <div style="position: relative; width: 100%; max-width: 760px; height: 240px; margin: 0 auto ${fontSize * 3}px auto; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
+          <div id="carousel-track" style="display: flex; width: 500%; height: 100%; transition: transform 0.5s ease-in-out;">
+            <!-- CAROUSEL IMAGE 1 -->
+            <div style="width: 20%; height: 100%; flex-shrink: 0; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center;">
+              <img src="images/carousel 1.png" alt="Carousel Image 1" id="carousel-img-1" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size: 48px; color: #999;\'>🍽️</span>';">
+            </div>
+            
+            <!-- CAROUSEL IMAGE 2 -->
+            <div style="width: 20%; height: 100%; flex-shrink: 0; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center;">
+              <img src="images/carousel 2.png" alt="Carousel Image 2" id="carousel-img-2" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size: 48px; color: #999;\'>🍽️</span>';">
+            </div>
+            
+            <!-- CAROUSEL IMAGE 3 -->
+            <div style="width: 20%; height: 100%; flex-shrink: 0; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center;">
+              <img src="images/carousel 3.png" alt="Carousel Image 3" id="carousel-img-3" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size: 48px; color: #999;\'>🍽️</span>';">
+            </div>
+            
+            <!-- CAROUSEL IMAGE 4 -->
+            <div style="width: 20%; height: 100%; flex-shrink: 0; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center;">
+              <img src="images/carousel 4.png" alt="Carousel Image 4" id="carousel-img-4" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size: 48px; color: #999;\'>🍽️</span>';">
+            </div>
+            
+            <!-- CAROUSEL IMAGE 5 -->
+            <div style="width: 20%; height: 100%; flex-shrink: 0; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center;">
+              <img src="images/carousel 5.png" alt="Carousel Image 5" id="carousel-img-5" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size: 48px; color: #999;\'>🍽️</span>';">
+            </div>
+          </div>
+          
+          <!-- Left Button -->
+          <button onclick="prevSlide()" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.9); color: ${primaryColor}; border: none; width: 48px; height: 48px; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='rgba(255,255,255,1)'; this.style.transform='translateY(-50%) scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.9)'; this.style.transform='translateY(-50%) scale(1)';">
+            ‹
+          </button>
+          
+          <!-- Right Button -->
+          <button onclick="nextSlide()" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.9); color: ${primaryColor}; border: none; width: 48px; height: 48px; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='rgba(255,255,255,1)'; this.style.transform='translateY(-50%) scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.9)'; this.style.transform='translateY(-50%) scale(1)';">
+            ›
+          </button>
+          
+          <!-- Slide Indicators -->
+          <div style="position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px;">
+            ${[0, 1, 2, 3, 4].map(i => `
+              <div style="width: 10px; height: 10px; border-radius: 50%; background: ${i === currentSlide ? 'white' : 'rgba(255, 255, 255, 0.5)'}; transition: all 0.3s ease;"></div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderHeader(config, fontSize) {
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      const restaurantName = config.restaurant_name || defaultConfig.restaurant_name;
+      const tagline = config.tagline || defaultConfig.tagline;
+      
+      return `
+        <header class="text-center mb-12">
+          <div style="display: flex; align-items: center; justify-content: center; gap: ${fontSize * 1.5}px; margin-bottom: ${fontSize * 0.5}px;">
+            <!-- LOGO IMAGE PLACEHOLDER -->
+            <img src="" alt="Logo" id="header-logo" style="height: ${fontSize * 3.5}px; width: auto; object-fit: contain;" onerror="this.style.display='none';">
+            
+            <h1 style="font-family: 'Ultra', serif; color: ${primaryColor}; font-size: ${fontSize * 3.5}px; font-weight: 400; margin: 0; text-transform: uppercase;">
+              ${restaurantName}
+            </h1>
+            
+            <!-- LOGO IMAGE PLACEHOLDER (duplicate for symmetry) -->
+            <img src="" alt="Logo" id="header-logo-right" style="height: ${fontSize * 3.5}px; width: auto; object-fit: contain;" onerror="this.style.display='none';">
+          </div>
+          <p style="font-family: 'League Spartan', sans-serif; color: ${textColor}; font-size: ${fontSize * 2}px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;">
+            ${tagline}
+          </p>
+        </header>
+      `;
+    }
+
+    function renderMainCategories(config, fontSize) {
+      let html = '';
+      let categoryIndex = 0;
+      
+      for (const [category, items] of Object.entries(menuData)) {
+        const categoryId = `cat-${categoryIndex}`;
+        html += renderCategory(categoryId, category, items, config, fontSize);
+        categoryIndex++;
+      }
+      
+      return html;
+    }
+
+    function renderBeverages(config, fontSize) {
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      const accentColor = config.accent_color || defaultConfig.accent_color;
+      const categoryId = 'beverages-main';
+      
+      let subHtml = '';
+      let subIndex = 0;
+      
+      for (const [subcategory, items] of Object.entries(beveragesData)) {
+        const subCategoryId = `bev-${subIndex}`;
+        subHtml += renderCategory(subCategoryId, subcategory, items, config, fontSize, true);
+        subIndex++;
+      }
+      
+      return `
+        <div class="mb-8">
+          <div class="category-header" onclick="toggleCategory('${categoryId}')" style="background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); padding: 0; height: 120px; position: relative; overflow: hidden;">
+            <img src="" alt="Beverages" id="cat-img-${categoryId}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: space-between; padding: 20px; background: ${config.card_color || defaultConfig.card_color};">
+              <h2 style="font-family: 'League Spartan', sans-serif; color: ${primaryColor}; font-size: ${fontSize * 2}px; font-weight: 700;">
+                Beverages
+              </h2>
+              <span id="arrow-${categoryId}" class="dropdown-arrow" style="color: ${accentColor}; font-size: ${fontSize * 2}px;">▼</span>
+            </div>
+          </div>
+          <div id="content-${categoryId}" class="category-content pl-4">
+            ${subHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCategory(categoryId, categoryName, items, config, fontSize, isSubcategory = false) {
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      const accentColor = config.accent_color || defaultConfig.accent_color;
+      const titleSize = isSubcategory ? fontSize * 1.5 : fontSize * 2;
+      
+      return `
+        <div class="mb-8">
+          <div class="category-header" onclick="toggleCategory('${categoryId}')" style="background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); padding: 0; height: 120px; position: relative; overflow: hidden;">
+            <img src="images/cat-img-${categoryId}.png" alt="${categoryName}" id="cat-img-${categoryId}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: space-between; padding: 20px; background: ${config.card_color || defaultConfig.card_color};">
+              <h2 style="font-family: 'League Spartan', sans-serif; color: ${primaryColor}; font-size: ${titleSize}px; font-weight: 700;">
+                ${categoryName}
+              </h2>
+              <span id="arrow-${categoryId}" class="dropdown-arrow" style="color: ${accentColor}; font-size: ${fontSize * 2}px;">▼</span>
+            </div>
+          </div>
+          <div id="content-${categoryId}" class="category-content mt-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              ${items.map(item => renderMenuItem(item, config, fontSize)).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFeedbackSection(config, fontSize) {
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      
+      return `
+        <div class="text-center mt-16 mb-8">
+          <p style="font-family: 'League Spartan', sans-serif; color: #ffffff; font-size: ${fontSize * 1.5}px; font-weight: 600; margin-bottom: ${fontSize * 1.5}px;">
+            Make Greenhouse 22 better with your feedback!
+          </p>
+          <a href="https://docs.google.com/forms/d/1pso6zc1ePqpl_8lp-gfTJ8TmMVcYZTpNYZbsqTDPEF0/edit" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: ${primaryColor}; color: white; font-family: 'League Spartan', sans-serif; font-size: ${fontSize * 1.1}px; font-weight: 700; padding: ${fontSize * 0.75}px ${fontSize * 2}px; border-radius: 8px; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0, 0, 0, 0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.15)';">
+            Customer Satisfaction Survey
+          </a>
+        </div>
+      `;
+    }
+
+    function renderMenuItem(item, config, fontSize) {
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      const accentColor = config.accent_color || defaultConfig.accent_color;
+      
+      // Create unique ID from item name (remove spaces and special characters)
+      const itemId = item.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      
+      let priceDisplay = `₱${item.price}`;
+      if (item.familySize) {
+        priceDisplay = `₱${item.price} / ₱${item.familySize}`;
+      }
+      
+      return `
+        <div class="menu-card" id="img-${itemId}" style="background: ${config.card_color || defaultConfig.card_color};">
+          <div class="menu-card-image">
+            <!-- IMAGE PLACEHOLDER: ${item.name} -->
+            <img src="images/${itemId}.png" alt="${item.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='🍽️';">
+          </div>
+          <div style="padding: ${fontSize}px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <h3 style="color: ${textColor}; font-size: ${fontSize * 1.1}px; font-weight: 700; margin-bottom: ${fontSize * 0.5}px; line-height: 1.3;">
+                ${item.name}
+              </h3>
+              ${item.description ? `
+                <p style="color: #6c757d; font-size: ${fontSize * 0.85}px; margin-bottom: ${fontSize * 0.5}px;">
+                  ${item.description}
+                </p>
+              ` : ''}
+              ${item.options ? `
+                <p style="color: ${accentColor}; font-size: ${fontSize * 0.85}px; margin-bottom: ${fontSize * 0.5}px;">
+                  ${item.options.join(' / ')}
+                </p>
+              ` : ''}
+              ${item.familySize ? `
+                <p style="color: ${accentColor}; font-size: ${fontSize * 0.85}px; margin-bottom: ${fontSize * 0.5}px;">
+                  Regular / Family Size
+                </p>
+              ` : ''}
+            </div>
+            <p style="color: ${primaryColor}; font-size: ${fontSize * 1.3}px; font-weight: 700; margin-top: ${fontSize * 0.5}px;">
+              ${priceDisplay}
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    initializeApp();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bb2183fc32c8d0f',t:'MTc2Nzk0MjQxNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
