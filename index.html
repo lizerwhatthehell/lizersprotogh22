@@ -3,662 +3,860 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Restaurant Menu</title>
+  <title>Greenhouse 22 Menu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="/_sdk/element_sdk.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Ultra&amp;family=League+Spartan:wght@400;600;700&amp;display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <style>
     body {
       box-sizing: border-box;
     }
     
-    .menu-card {
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Background for ALL category grids, Hi, This is Eliezer, I made this website. */
+#category-grid {
+  background-image: url("background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 1.5rem;
+}
+
+#menu-items-container {
+  background-image: url("background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
+
+/* Optional soft overlay */
+#menu-items-container {
+  position: relative;
+}
+
+#menu-items-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(240, 253, 244, 0.5);
+}
+
+#menu-items-container > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Optional overlay for readability */
+#category-grid {
+  position: relative;
+}
+
+#category-grid > * {
+  position: relative;
+  z-index: 1;
+}
+    @font-face {
+      font-family: 'Ultra';
+      src: url('https://fonts.gstatic.com/s/ultra/v23/zOLy4prXmrtY-tT6.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+    }
+    
+    .font-ultra {
+      font-family: 'Ultra', serif;
+    }
+    
+    .font-league {
+      font-family: 'League Spartan', sans-serif;
+    }
+    
+    .category-card {
       aspect-ratio: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .menu-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    }
-    
-    .menu-card-image {
-      width: 100%;
-      height: 80%;
-      background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-      color: #999;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
     }
     
-    .menu-card-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .category-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
     }
     
-    .category-header {
-      cursor: pointer;
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      transition: all 0.3s ease;
-      margin-bottom: 12px;
+    .category-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(134, 239, 172, 0..01) 0%, rgba(74, 222, 128, 0.8) 100%);
+      z-index: 1;
     }
     
-    .category-header:hover {
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-      transform: translateY(-2px);
+    .category-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+      z-index: 2;
     }
     
-    .category-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease-out;
-    }
-    
-    .category-content.open {
-      max-height: 10000px;
-      transition: max-height 0.6s ease-in;
-    }
-    
-    .dropdown-arrow {
+    .sidebar-mode {
+      position: fixed;
+      top: 100px;
+      left: 0;
+      width: 224px;
+      height: calc(100% - 100px);
+      overflow-y: auto;
+      z-index: 40;
       transition: transform 0.3s ease;
-      display: inline-block;
     }
     
-    .dropdown-arrow.open {
-      transform: rotate(180deg);
+    .content-mode {
+      margin-left: 224px;
+      transition: margin-left 0.3s ease;
+    }
+    
+    .sidebar-card {
+      aspect-ratio: auto;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .sidebar-card:hover {
+      transform: none;
+      background-color: rgba(134, 239, 172, 0.6);
+    }
+    
+    .sidebar-card.active {
+      background-color: rgba(21, 128, 61, 0.2);
+      border-left: 4px solid #15803d;
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar-mode {
+        width: 100%;
+        height: auto;
+        position: sticky;
+        top: 88px;
+        display: flex;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0.75rem;
+        gap: 0.75rem;
+        background: rgba(220, 252, 231, 0.98);
+        backdrop-filter: blur(8px);
+      }
+      
+      .sidebar-card {
+        min-width: 110px;
+        width: 110px;
+        height: 110px;
+        flex-shrink: 0;
+        aspect-ratio: 1;
+        padding: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .sidebar-card .flex {
+        flex-direction: column;
+        gap: 0.375rem;
+        text-align: center;
+      }
+      
+      .sidebar-card span:first-child {
+        font-size: 2rem;
+      }
+      
+      .sidebar-card span:last-child {
+        font-size: 1.2rem;
+        line-height: 1.2;
+        font-weight: 600;
+      }
+      
+      .content-mode {
+        margin-left: 0;
+      }
+    }
+    
+    .menu-content {
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .option-btn {
+      transition: all 0.2s ease;
+    }
+    
+    .option-btn.selected {
+      background-color: #15803d;
+      color: white;
+      border-color: #15803d;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #dcfce7;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #86efac;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4ade80;
     }
   </style>
   <style>@view-transition { navigation: auto; }</style>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
- <body class="h-full"><!-- BACKGROUND IMAGE PLACEHOLDER -->
-  <div id="background-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
-    <img src="background.JPG" alt="Background" id="background-img" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';">
+ <body class="h-full font-league bg-green-50 text-green-900">
+  <div id="app-container" class="w-full h-full overflow-auto"><!-- Sticky Header -->
+   <header id="sticky-header" class="sticky top-0 z-50 bg-green-100/95 backdrop-blur-sm border-b border-green-300/50 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+     <div class="flex items-center justify-center gap-4"><!-- Logo Placeholder -->
+      <div class="w-20 h-20 md:w-20 md:h-20 border-2 border-dashed border-green-400 rounded-lg flex items-center justify-center flex-shrink-0 bg-green-200/30">
+       <svg class="w-16 h-16 text-green-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <IMG SRC="LOGO.PNG"></img></svg>
+       </svg>
+      </div><!-- Title Section -->
+      <div class="text-center flex-grow">
+       <h1 id="restaurant-name" class="font-ultra text-2xl md:text-4xl lg:text-5xl text-green-700 tracking-wide leading-tight uppercase">Greenhouse 22</h1>
+       <p id="restaurant-tagline" class="font-league font-bold text-sm md:text-sm lg:text-base text-green-700 tracking-[0.35em] md:tracking-[0.5em] lg:tracking-[0.6em] uppercase mt-1">Fishing Station &amp; Restaurant</p>
+       <p class="font-league font-bold text-xs md:text-sm lg:text-base text-green-700 tracking-[0.35em] md:tracking-[0.5em] lg:tracking-[0.6em] uppercase mt-1">Purok Sweet Rose, Dumagoc, Pagadian City<br>0977-750-5800</p>
+      </div><!-- Menu Button -->
+      <div class="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 relative"><button id="menu-toggle" class="w-full h-full flex items-center justify-center hover:bg-green-200/50 rounded-lg transition-colors" onclick="toggleMenu()">
+        <svg class="w-6 h-6 md:w-8 md:h-8 text-green-700" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg></button> <!-- Dropdown Menu -->
+       <div id="dropdown-menu" class="hidden absolute top-full right-0 mt-2 w-72 bg-white border-2 border-green-300/50 rounded-xl shadow-2xl z-50 overflow-hidden">
+        <div class="p-6 space-y-6"><!-- Social Media Section -->
+         <div>
+          <p class="text-green-800 text-sm font-semibold mb-3">Visit us at:</p>
+          <div class="space-y-2"><a href="https://www.facebook.com/GH22FSR" target="_blank" rel="noopener noreferrer" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors text-center"> Facebook </a> <a href="https://www.instagram.com/22_greenhouse" target="_blank" rel="noopener noreferrer" class="block w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-4 rounded-lg transition-colors text-center"> Instagram </a>
+          </div>
+         </div><!-- Divider -->
+         <div class="border-t border-green-300/50"></div><!-- Survey Section -->
+         <div>
+          <p class="text-green-800 text-sm font-semibold mb-3">Make Greenhouse better with your feedback</p><a href="https://forms.gle/j4cX6hfnbdCMKtzSA" target="_blank" rel="noopener noreferrer" class="block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors text-center"> Customer Satisfaction Survey </a>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </header><!-- Main Content Area -->
+   <main id="main-content" class="transition-all duration-300"><!-- Category Grid View -->
+    <div id="category-grid" class="max-w-6xl mx-auto px-4 py-8">
+     <div id="category-grid-container" class="grid grid-cols-3 auto-rows-fr gap-3 md:gap-6 lg:gap-8"><!-- Categories will be dynamically generated -->
+     </div>
+    </div><!-- Sidebar + Menu Items View (Hidden by default) -->
+    <div id="sidebar-view" class="hidden"><!-- Sidebar -->
+     <aside id="category-sidebar" class="sidebar-mode bg-green-100/80 backdrop-blur-sm border-r border-green-300/50"><!-- Sidebar items will be dynamically generated -->
+     </aside><!-- Menu Items Content -->
+     <div id="menu-items-container" class="content-mode px-4 md:px-8 py-8"><!-- Menu items will be dynamically generated -->
+     </div>
+    </div>
+   </main><!-- Footer, 
+    January 16, 2026
+    
+    Hi,
+    this is Eliezer Deleverio Alforque.
+    I made this site for Greenhouse 22
+    as a Marketing Staff.
+    So if anything that I wanna make
+    for Greenhouse 22 before I leave,
+    it would be this site that I'm proud of.
+    If you can read this message,
+    I may have left already.
+    So, good luck,
+    and I wish Greenhouse 22
+    the prosperity it deserves :) -->
+   <footer class="border-t border-green-300 mt-12 py-6 text-center text-green-600 text-sm">
+    <p>© 2026 Greenhouse 22 • Fishing Station &amp; Restaurant</p>
+   </footer>
   </div>
-  <div id="app" class="w-full h-full overflow-auto"></div>
   <script>
     const defaultConfig = {
-      restaurant_name: "Greenhouse 22",
-      tagline: "Fishing Station & Restaurant",
-      background_image: "friedkangkong.png",
-      card_color: "#ffffff",
-      primary_color: "#75e36d",
-      accent_color: "#52b788",
-      text_color: "#000000",
-      font_family: "League Spartan",
-      font_size: 12
+      restaurant_name: 'Greenhouse 22',
+      restaurant_tagline: 'Fishing Station & Restaurant',
+      background_color: '#f0fdf4',
+      header_color: '#dcfce7',
+      text_color: '#14532d',
+      accent_color: '#15803d',
+      card_color: '#bbf7d0',
+      font_family: 'League Spartan',
+      font_size: 16
     };
 
     const menuData = {
-      'Tilapia': [
-        { name: 'Grilled Tilapia Meal', price: 195 },
-        { name: 'Deep Fried Tilapia Meal', price: 195 },
-        { name: 'Kinilaw na Tilapia', price: 249, options: ['Sinigang', 'Tinola'] },
-        { name: 'Sizzling Tilapia', price: 259 },
-        { name: 'Tilapia Paksiw', price: 249 },
-        { name: 'Tilapia Sinigang', price: 249 },
-        { name: 'Tilapia Tinola', price: 249 }
-      ],
-      'Tuna': [
-        { name: 'Deep Fried Tuna Steak', price: 395 },
-        { name: 'Grilled Tuna Steak', price: 395 },
-        { name: 'Kinilaw na Bariles', price: 279, options: ['Binisaya', 'Dressing'] },
-        { name: 'Sinuglaw', price: 495 },
-        { name: 'Sinigang na Bariles', price: 395 },
-        { name: 'Tinolang Bariles', price: 395 }
-      ],
-      'Squid': [
-        { name: 'Adobong Pusit', price: 395 },
-        { name: 'Calamares', price: 395 },
-        { name: 'Crispy Squid Flower', price: 395 },
-        { name: 'Deep Fried Squid', price: 395 },
-        { name: 'Grilled Squid', price: 395 },
-        { name: 'Sizzling Squid', price: 395 },
-        { name: 'Squid Fries', price: 395 }
-      ],
-      'Shrimp': [
-        { name: 'Camaron Rebosado', price: 295, familySize: 595 },
-        { name: 'Deep Fried Shrimps', price: 295, familySize: 595 },
-        { name: 'Shrimp in Butter Garlic Sauce', price: 295, familySize: 595 },
-        { name: 'Shrimp in Garlic Sauce', price: 295, familySize: 595 },
-        { name: 'Shrimp in Greenhouse 22 Sauce', price: 295, familySize: 595 },
-        { name: 'Sinigang Hipon', price: 295 },
-        { name: 'Tinolang Hipon', price: 295 },
-        { name: 'Shrimp Kare-Kare', price: 595 }
-      ],
-      'Shells': [
-        { name: 'Sizzling Shells', price: 275 },
-        { name: 'Sinigang Shells', price: 275 },
-        { name: 'Tinolang Shells', price: 275 },
-        { name: 'Steamed Shells', price: 275 }
-      ],
-      'Chicken': [
-        { name: 'Grilled Chicken Meal', price: 225 },
-        { name: 'Batter Fried Chicken', price: 375 },
-        { name: 'Fried Chicken', price: 375 },
-        { name: 'Sizzling Chicken', price: 375 },
-        { name: 'Chicken Wings BBQ Platter', price: 495 },
-        { name: 'Satay Platter', price: 895 }
-      ],
-      'Native Chicken': [
-        { name: 'Adobong Manok', price: 425 },
-        { name: 'Piniritong Manok', price: 425 },
-        { name: 'Tinolang Manok', price: 425 }
-      ],
-      'Pork': [
-        { name: 'Deep Fried Pork Chop Meal', price: 235 },
-        { name: 'Grilled Pork Belly Meal', price: 235 },
-        { name: 'Grilled Pork Chop Meal', price: 235 },
-        { name: 'Binagoongang Baboy', price: 395 },
-        { name: 'Binitsuelasang Baboy', price: 425, description: 'Pata with White Beans' },
-        { name: 'Crispy Pata', price: 695 },
-        { name: 'Lechon Kawali', price: 395 },
-        { name: 'Sinigang Baboy', price: 395 },
-        { name: 'Sizzling Pork Chop', price: 335 },
-        { name: 'Sizzling Sisig', price: 295 },
-        { name: 'Sizzling Sisig with Egg', price: 395 },
-        { name: 'Pork Kare-Kare', price: 595 },
-        { name: 'Pork BBQ Platter', price: 495 }
-      ],
-      'Beef': [
-        { name: 'Beef Tapa', price: 325 },
-        { name: 'Sizzling Beef Steak', price: 325 },
-        { name: 'Sizzling Tenderloin', price: 325 }
-      ],
-      'Rice & Noodles': [
-        { name: 'Plain Rice', price: 39 },
-        { name: 'Plain Rice Platter', price: 179 },
-        { name: 'Garlic Fried Rice', price: 49 },
-        { name: 'Garlic Fried Rice Platter', price: 225 },
-        { name: 'Pancit Guisado', price: 315, options: ['Chicken', 'Pork'] },
-        { name: 'Lomi', price: 315, options: ['Chicken', 'Pork'] },
-        { name: 'Sotanghon', price: 315 }
-      ],
-      'All Day Breakfast': [
-        { name: 'Longganisa Rice Bowl', price: 195 },
-        { name: 'Beef Tapa Rice Bowl', price: 195 },
-        { name: 'Hungarian Rice Bowl', price: 195 }
-      ],
-      'Appetizer': [
-        { name: 'Sweet Fried Dilis', price: 195 }
-      ],
-      'Vegetable and Healthy Options': [
-        { name: 'Camote Fries', price: 125 },
-        { name: 'Banana Fries', price: 125 },
-        { name: 'Fried Banana', price: 125 },
-        { name: 'Fried Kangkong', price: 185 },
-        { name: 'Tortang Talong', price: 185 },
-        { name: 'Ensaladang Talong', price: 185 },
-        { name: 'Guisadong Kangkong', price: 185 },
-        { name: 'Steamed Kangkong', price: 185 },
-        { name: 'Cucumber Salad', price: 185 },
-        { name: 'Lumpiang Gulay', price: 195 },
-        { name: 'Sizzling Shiitake Mushrooms', price: 225 },
-        { name: 'Chopsuey', price: 315 },
-        { name: 'Vegetable Kare-Kare', price: 395 }
-      ]
-    };
-
-    const beveragesData = {
-      'Sodas': [
-        { name: 'Pepsi', price: 40 },
-        { name: '7-up', price: 40 },
-        { name: 'Cali', price: 75, description: 'In a can' }
-      ],
-      'Fruit Sodas': [
-        { name: 'Mango Surprise', price: 125 },
-        { name: 'Raspberry Wonder', price: 125 },
-        { name: 'Peach Sparkle', price: 125 }
-      ],
-      'Juices': [
-        { name: 'Calamansi', price: 85 },
-        { name: 'Mango', price: 85 },
-        { name: 'Pineapple Orange', price: 85 },
-        { name: 'Fresh Buko', price: 85 },
-        { name: 'Buko Juice in Glass', price: 85 }
-      ],
-      'Fruit Tea': [
-        { name: 'Mango Sunrise', price: 125 },
-        { name: 'Raspberry Sunset', price: 125 },
-        { name: 'Peach Twilight', price: 125 }
-      ],
-      'Hot Tea': [
-        { name: 'Chamomile Flowers', price: 120 },
-        { name: 'Ceylon Breakfast', price: 120 },
-        { name: 'Early Grey w/ Vanilla', price: 120 },
-        { name: 'English Breakfast', price: 120 },
-        { name: 'Lemon & Ginger', price: 120 },
-        { name: 'Oolong Tea with Peach', price: 120 },
-        { name: 'Pure Green Tea', price: 120 },
-        { name: 'Strawberry and Mango', price: 120 }
-      ],
-      'Greenhouse Iced Tea': [
-        { name: 'Glass', price: 95 },
-        { name: 'Pitcher', price: 295 }
-      ],
-      'Fresh Cucumber Lemonade': [
-        { name: 'Glass', price: 95 },
-        { name: 'Pitcher', price: 295 }
-      ],
-      'Shakes': [
-        { name: 'Mango Shake', price: 105 },
-        { name: 'Buko Shake', price: 105 },
-        { name: 'Papaya Shake', price: 105 },
-        { name: 'Avocado Shake', price: 105 }
-      ],
-      'Beer': [
-        { name: 'San Miguel Flavored', price: 125 }
-      ]
-    };
-
-    let openCategories = {};
-    let currentSlide = 0;
-    let carouselInterval;
-
-    function initializeApp() {
-      if (window.elementSdk) {
-        window.elementSdk.init({
-          defaultConfig,
-          onConfigChange: async (config) => {
-            render();
+      tilapia: {
+        name: 'TILAPIA',
+        icon: '',
+        items: [
+          { name: 'Grilled Tilapia Meal', price: 195 },
+          { name: 'Deep Fried Tilapia Meal', price: 195 },
+          { name: 'Kinilaw na Tilapia', price: 249, options: { type: 'single', label: 'Served with', choices: ['Sinigang', 'Tinola'] } },
+          { name: 'Sizzling Tilapia', price: 259 },
+          { name: 'Tilapia Paksiw', price: 249 },
+          { name: 'Tilapia Sinigang', price: 249 },
+          { name: 'Tilapia Tinola', price: 249 }
+        ]
+      },
+      tuna: {
+        name: 'TUNA',
+        icon: '',
+        items: [
+          { name: 'Deep Fried Tuna Steak', price: 395 },
+          { name: 'Grilled Tuna Steak', price: 395 },
+          { name: 'Kinilaw na Bariles', price: 279, options: { type: 'single', label: 'Style', choices: ['Binisaya', 'Dressing'] } },
+          { name: 'Sinuglaw', price: 495 },
+          { name: 'Sinigang na Bariles', price: 395 },
+          { name: 'Tinolang Bariles', price: 395 }
+        ]
+      },
+      squid: {
+        name: 'SQUID',
+        icon: '',
+        items: [
+          { name: 'Adobong Pusit', price: 395 },
+          { name: 'Calamares', price: 395 },
+          { name: 'Crispy Squid Flower', price: 395 },
+          { name: 'Deep Fried Squid', price: 395 },
+          { name: 'Grilled Squid', price: 395 },
+          { name: 'Sizzling Squid', price: 395 },
+          { name: 'Squid Fries', price: 395 }
+        ]
+      },
+      shrimp: {
+        name: 'SHRIMP',
+        icon: '',
+        items: [
+          { name: 'Camaron Rebosado', price: 295, familyPrice: 595 },
+          { name: 'Deep Fried Shrimps', price: 295, familyPrice: 595 },
+          { name: 'Shrimp in Butter Garlic Sauce', price: 295, familyPrice: 595 },
+          { name: 'Shrimp in Garlic Sauce', price: 295, familyPrice: 595 },
+          { name: 'Shrimp in Greenhouse 22 Sauce', price: 295, familyPrice: 595 },
+          { name: 'Sinigang Hipon', price: 295 },
+          { name: 'Tinolang Hipon', price: 295 },
+          { name: 'Shrimp Kare-Kare', price: 595 }
+        ]
+      },
+      shells: {
+        name: 'SHELLS',
+        icon: '',
+        items: [
+          { name: 'Sizzling Shells', price: 275 },
+          { name: 'Sinigang Shells', price: 275 },
+          { name: 'Tinolang Shells', price: 275 },
+          { name: 'Steamed Shells', price: 275 }
+        ]
+      },
+      chicken: {
+        name: 'CHICKEN',
+        icon: '',
+        items: [
+          { name: 'Grilled Chicken Meal', price: 225 },
+          { name: 'Batter Fried Chicken', price: 375 },
+          { name: 'Fried Chicken', price: 375 },
+          { name: 'Sizzling Chicken', price: 375 },
+          { name: 'Chicken Wings BBQ Platter', price: 495 },
+          { name: 'Satay Platter', price: 895 }
+        ]
+      },
+      nativeChicken: {
+        name: 'NATIVE CHICKEN',
+        icon: '',
+        items: [
+          { name: 'Adobong Manok', price: 425 },
+          { name: 'Piniritong Manok', price: 425 },
+          { name: 'Tinolang Manok', price: 425 }
+        ]
+      },
+      pork: {
+        name: 'PORK',
+        icon: '',
+        items: [
+          { name: 'Deep Fried Pork Chop Meal', price: 235 },
+          { name: 'Grilled Pork Belly Meal', price: 235 },
+          { name: 'Grilled Pork Chop Meal', price: 235 },
+          { name: 'Binagoongang Baboy', price: 395 },
+          { name: 'Binitsuelasang Baboy', price: 425, description: 'Pata with White Beans' },
+          { name: 'Crispy Pata', price: 695 },
+          { name: 'Lechon Kawali', price: 395 },
+          { name: 'Sinigang Baboy', price: 395 },
+          { name: 'Sizzling Pork Chop', price: 335 },
+          { name: 'Sizzling Sisig', price: 295 },
+          { name: 'Sizzling Sisig with Egg', price: 395 },
+          { name: 'Pork Kare-Kare', price: 595 },
+          { name: 'Pork BBQ Platter', price: 495 }
+        ]
+      },
+      beef: {
+        name: 'BEEF',
+        icon: '',
+        items: [
+          { name: 'Beef Tapa', price: 325 },
+          { name: 'Sizzling Beef Steak', price: 325 },
+          { name: 'Sizzling Tenderloin', price: 325 }
+        ]
+      },
+      riceNoodles: {
+        name: 'RICE & NOODLES',
+        icon: '',
+        items: [
+          { name: 'Plain Rice', price: 39 },
+          { name: 'Plain Rice Platter', price: 179 },
+          { name: 'Garlic Fried Rice', price: 49 },
+          { name: 'Garlic Fried Rice Platter', price: 225 },
+          { name: 'Pancit Guisado', price: 315, options: { type: 'single', label: 'With', choices: ['Chicken', 'Pork'] } },
+          { name: 'Lomi', price: 315, options: { type: 'single', label: 'With', choices: ['Chicken', 'Pork'] } },
+          { name: 'Sotanghon', price: 315 }
+        ]
+      },
+      breakfast: {
+        name: 'ALL DAY BREAKFAST',
+        icon: '',
+        items: [
+          { name: 'Longganisa Rice Bowl', price: 195 },
+          { name: 'Beef Tapa Rice Bowl', price: 195 },
+          { name: 'Hungarian Rice Bowl', price: 195 }
+        ]
+      },
+      appetizer: {
+        name: 'APPETIZER',
+        icon: '',
+        items: [
+          { name: 'Sweet Fried Dilis', price: 195 }
+        ]
+      },
+      vegetable: {
+        name: 'VEGETABLE & HEALTHY OPTIONS',
+        icon: '',
+        items: [
+          { name: 'Camote Fries', price: 125 },
+          { name: 'Banana Fries', price: 125 },
+          { name: 'Fried Banana', price: 125 },
+          { name: 'Fried Kangkong', price: 185 },
+          { name: 'Tortang Talong', price: 185 },
+          { name: 'Ensaladang Talong', price: 185 },
+          { name: 'Guisadong Kangkong', price: 185 },
+          { name: 'Steamed Kangkong', price: 185 },
+          { name: 'Cucumber Salad', price: 185 },
+          { name: 'Lumpiang Gulay', price: 195 },
+          { name: 'Sizzling Shiitake Mushrooms', price: 225 },
+          { name: 'Chopsuey', price: 315 },
+          { name: 'Vegetable Kare-Kare', price: 395 }
+        ]
+      },
+      beverages: {
+        name: 'BEVERAGES',
+        icon: '',
+        subcategories: [
+          {
+            name: 'Sodas',
+            items: [
+              { name: 'Pepsi', price: 40 },
+              { name: '7-up', price: 40 },
+              { name: 'Cali', price: 75, description: 'In a can' }
+            ]
           },
-          mapToCapabilities: (config) => ({
-            recolorables: [
-              {
-                get: () => config.background_color || defaultConfig.background_color,
-                set: (value) => {
-                  config.background_color = value;
-                  window.elementSdk.setConfig({ background_color: value });
-                }
-              },
-              {
-                get: () => config.card_color || defaultConfig.card_color,
-                set: (value) => {
-                  config.card_color = value;
-                  window.elementSdk.setConfig({ card_color: value });
-                }
-              },
-              {
-                get: () => config.primary_color || defaultConfig.primary_color,
-                set: (value) => {
-                  config.primary_color = value;
-                  window.elementSdk.setConfig({ primary_color: value });
-                }
-              },
-              {
-                get: () => config.accent_color || defaultConfig.accent_color,
-                set: (value) => {
-                  config.accent_color = value;
-                  window.elementSdk.setConfig({ accent_color: value });
-                }
-              },
-              {
-                get: () => config.text_color || defaultConfig.text_color,
-                set: (value) => {
-                  config.text_color = value;
-                  window.elementSdk.setConfig({ text_color: value });
-                }
-              }
-            ],
-            borderables: [],
-            fontEditable: {
-              get: () => config.font_family || defaultConfig.font_family,
-              set: (value) => {
-                config.font_family = value;
-                window.elementSdk.setConfig({ font_family: value });
-              }
-            },
-            fontSizeable: {
-              get: () => config.font_size || defaultConfig.font_size,
-              set: (value) => {
-                config.font_size = value;
-                window.elementSdk.setConfig({ font_size: value });
-              }
-            }
-          }),
-          mapToEditPanelValues: (config) => new Map([
-            ['restaurant_name', config.restaurant_name || defaultConfig.restaurant_name],
-            ['tagline', config.tagline || defaultConfig.tagline]
-          ])
-        });
+          {
+            name: 'Fruit Sodas',
+            items: [
+              { name: 'Mango Surprise', price: 125 },
+              { name: 'Raspberry Wonder', price: 125 },
+              { name: 'Peach Sparkle', price: 125 }
+            ]
+          },
+          {
+            name: 'Juices',
+            items: [
+              { name: 'Calamansi', price: 85 },
+              { name: 'Mango', price: 85 },
+              { name: 'Pineapple Orange', price: 85 },
+              { name: 'Fresh Buko', price: 85 },
+              { name: 'Buko Juice in Glass', price: 85 }
+            ]
+          },
+          {
+            name: 'Fruit Tea',
+            items: [
+              { name: 'Mango Sunrise', price: 125 },
+              { name: 'Raspberry Sunset', price: 125 },
+              { name: 'Peach Twilight', price: 125 }
+            ]
+          },
+          {
+            name: 'Hot Tea',
+            items: [
+              { name: 'Chamomile Flowers', price: 120 },
+              { name: 'Ceylon Breakfast', price: 120 },
+              { name: 'Early Grey w/ Vanilla', price: 120 },
+              { name: 'English Breakfast', price: 120 },
+              { name: 'Lemon & Ginger', price: 120 },
+              { name: 'Oolong Tea with Peach', price: 120 },
+              { name: 'Pure Green Tea', price: 120 },
+              { name: 'Strawberry and Mango', price: 120 }
+            ]
+          },
+          {
+            name: 'Greenhouse Iced Tea',
+            items: [
+              { name: 'Glass', price: 95 },
+              { name: 'Pitcher', price: 295 }
+            ]
+          },
+          {
+            name: 'Fresh Cucumber Lemonade',
+            items: [
+              { name: 'Glass', price: 95 },
+              { name: 'Pitcher', price: 295 }
+            ]
+          },
+          {
+            name: 'Shakes',
+            items: [
+              { name: 'Mango Shake', price: 105 },
+              { name: 'Buko Shake', price: 105 },
+              { name: 'Papaya Shake', price: 105 },
+              { name: 'Avocado Shake', price: 105 }
+            ]
+          },
+          {
+            name: 'Beer',
+            items: [
+              { name: 'San Miguel Flavored', price: 125 }
+            ]
+          }
+        ]
+      },
+      lechon: {
+        name: 'LECHON',
+        icon: '',
+        items: [
+          { name: 'Family (20Kg)', price: 7499, description: 'Good for 20-25 persons' },
+          { name: 'Small (25Kg)', price: 8499, description: 'Good for 25-30 persons' },
+          { name: 'Medium (30Kg)', price: 9499, description: 'Good for 30-35 persons' },
+          { name: 'Large (35Kg)', price: 10499, description: 'Good for 35-40 persons' },
+          { name: 'Extra Large (40Kg)', price: 11499, description: 'Good for 40-45 persons' },
+          { name: 'Innards Cooking Charge', price: 800 }
+        ]
       }
-      
-      render();
+    };
+
+    let currentCategory = null;
+    const selectedOptions = {};
+
+    function renderCategoryGrid() {
+      const grid = document.getElementById('category-grid-container');
+      grid.innerHTML = '';
+
+      Object.entries(menuData).forEach(([key, category]) => {
+        const card = document.createElement('div');
+        card.className = 'category-card bg-green-300 rounded-2xl border-2 border-green-400/50 shadow-xl cursor-pointer';
+        card.onclick = () => selectCategory(key);
+        
+        card.innerHTML = `
+          <img src="${category.name}.png" alt="${category.name}" class="w-full h-full object-cover rounded-xl" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="w-full h-full border-4 border-dashed border-green-500/50 rounded-xl flex items-center justify-center bg-green-200/30" style="display: flex;">
+            <svg class="w-12 h-12 md:w-16 md:h-16 text-green-600/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div class="category-label">
+            <div class="flex items-center gap-2 justify-center">
+              <span class="text-2xl md:text-3xl">${category.icon}</span>
+              <span class="text-sm md:text-base font-bold text-white text-center">${category.name}</span>
+            </div>
+          </div>
+        `;
+        
+        grid.appendChild(card);
+      });
     }
 
-    function getConfig() {
-      return window.elementSdk?.config || defaultConfig;
+    function renderSidebar() {
+      const sidebar = document.getElementById('category-sidebar');
+      sidebar.innerHTML = '';
+
+      Object.entries(menuData).forEach(([key, category]) => {
+        const card = document.createElement('div');
+        card.className = `sidebar-card bg-green-200/60 border-b border-green-300/30 ${currentCategory === key ? 'active' : ''}`;
+        card.onclick = () => selectCategory(key);
+        
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">${category.icon}</span>
+            <span class="text-sm md:text-base font-semibold text-green-900">${category.name}</span>
+          </div>
+        `;
+        
+        sidebar.appendChild(card);
+      });
     }
 
-    function toggleCategory(categoryId) {
-      openCategories[categoryId] = !openCategories[categoryId];
+    function renderMenuItems() {
+      const container = document.getElementById('menu-items-container');
+      if (!currentCategory || !menuData[currentCategory]) {
+        container.innerHTML = '';
+        return;
+      }
+
+      const category = menuData[currentCategory];
       
-      const content = document.getElementById(`content-${categoryId}`);
-      const arrow = document.getElementById(`arrow-${categoryId}`);
+      let itemsHtml = '';
+      if (category.subcategories) {
+        itemsHtml = category.subcategories.map(sub => `
+          <div class="mb-8">
+            <h3 class="text-green-700 font-bold text-xl md:text-2xl mb-4 border-b-2 border-green-300/50 pb-2 uppercase">${sub.name}</h3>
+            <div class="space-y-4">
+              ${sub.items.map(item => renderMenuItem(currentCategory, item)).join('')}
+            </div>
+          </div>
+        `).join('');
+      } else {
+        itemsHtml = `
+          <div class="space-y-4">
+            ${category.items.map(item => renderMenuItem(currentCategory, item)).join('')}
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="menu-content max-w-4xl">
+          <button onclick="returnToCategories()" class="mb-6 flex items-center gap-2 bg-green-200/60 hover:bg-green-300/60 text-green-900 font-semibold py-3 px-6 rounded-lg transition-colors border border-green-300/50">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Return to Categories
+          </button>
+          <div class="mb-6"><center>
+            <h2 class="text-5xl md:text-4xl font-bold text-green-700">${category.name}</h2></center>
+          </div>
+          ${itemsHtml}
+          <button onclick="returnToCategories()" class="mt-8 flex items-center gap-2 bg-green-200/60 hover:bg-green-300/60 text-green-900 font-semibold py-3 px-6 rounded-lg transition-colors border border-green-300/50">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Return to Categories
+          </button>
+        </div>
+      `;
+    }
+
+    function renderMenuItem(categoryKey, item) {
+      const itemKey = `${categoryKey}-${item.name.replace(/\s+/g, '-').toLowerCase()}`;
+      const currentSelection = selectedOptions[itemKey];
       
-      if (content && arrow) {
-        if (openCategories[categoryId]) {
-          content.classList.add('open');
-          arrow.classList.add('open');
-        } else {
-          content.classList.remove('open');
-          arrow.classList.remove('open');
+      let priceDisplay = '';
+      if (item.price !== null) {
+        priceDisplay = `₱${item.price}`;
+        if (item.familyPrice) {
+          priceDisplay += ` <span class="text-yellow-300 text-sm">/ Family Size ₱${item.familyPrice}</span>`;
         }
       }
-    }
-
-    window.toggleCategory = toggleCategory;
-
-    function nextSlide() {
-      currentSlide = (currentSlide + 1) % 5;
-      updateCarousel();
-      resetCarouselInterval();
-    }
-
-    function prevSlide() {
-      currentSlide = (currentSlide - 1) % 5;
-      updateCarousel();
-      resetCarouselInterval();
-    }
-
-    function updateCarousel() {
-      const carousel = document.getElementById('carousel-track');
-      if (carousel) {
-        carousel.style.transform = `translateX(-${currentSlide * 20}%)`;
-      }
-    }
-   
-    function resetCarouselInterval() {
-      if (carouselInterval) {
-        clearInterval(carouselInterval);
-      }
-      carouselInterval = setInterval(nextSlide, 3000);
-    }
-   
-    function startCarousel() {
-      resetCarouselInterval();
-    }
-
-    window.nextSlide = nextSlide;
-    window.prevSlide = prevSlide;
-
-    function render() {
-      const config = getConfig();
-      const app = document.getElementById('app');
       
-      const customFont = config.font_family || defaultConfig.font_family;
-      const baseFontStack = 'sans-serif';
-      const fontSize = config.font_size || defaultConfig.font_size;
-      const bgColor = config.background_color || defaultConfig.background_color;
-      
-      app.style.fontFamily = `${customFont}, ${baseFontStack}`;
-      app.style.backgroundColor = bgColor;
-      
-      app.innerHTML = `
-        <div class="w-full min-h-full p-6 md:p-12">
-          <div class="max-w-7xl mx-auto">
-            ${renderHeader(config, fontSize)}
-            ${renderCarousel(config, fontSize)}
-            ${renderMainCategories(config, fontSize)}
-            ${renderBeverages(config, fontSize)}
-            ${renderFeedbackSection(config, fontSize)}
-          </div>
-        </div>
-      `;
-      
-      // Start carousel after render
-      setTimeout(startCarousel, 100);
-    }
-
-    function renderCarousel(config, fontSize) {
-      const primaryColor = config.primary_color || defaultConfig.primary_color;
-      
-      return `
-        <div style="position: relative; width: 100%; max-width: 1280px; height: 100%; max-height: 720px; aspect-ratio: 16 / 9; margin: 0 auto ${fontSize * 3}px auto; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
-          <div id="carousel-track" style="display: flex; width: 500%; height: 100%; transition: transform 0.5s ease-in-out;">
-            <!-- CAROUSEL IMAGE 1 -->
-            <div style="min-width: 20%; min-height: 100%; flex-shrink: 0; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center;">
-              <img src="carousel-1.png" alt="Carousel Image 1" id="carousel-img-1" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size: 48px; color: #999;\'>🍽️</span>';">
-            </div>
-            
-            <!-- CAROUSEL IMAGE 2 -->
-            <div style="min-width: 20%; min-height: 100%; flex-shrink: 0; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center;">
-              <img src="carousel-2.png" alt="Carousel Image 2" id="carousel-img-2" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size: 48px; color: #999;\'>🍽️</span>';">
-            </div>
-            
-            <!-- CAROUSEL IMAGE 3 -->
-            <div style="min-width: 20%; min-height: 100%; flex-shrink: 0; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center;">
-              <img src="carousel-3.png" alt="Carousel Image 3" id="carousel-img-3" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size: 48px; color: #999;\'>🍽️</span>';">
-            </div>
-            
-            <!-- CAROUSEL IMAGE 4 -->
-            <div style="min-width: 20%; min-height: 100%; flex-shrink: 0; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center;">
-              <img src="carousel-4.png" alt="Carousel Image 4" id="carousel-img-4" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size: 48px; color: #999;\'>🍽️</span>';">
-            </div>
-            
-            <!-- CAROUSEL IMAGE 5 -->
-            <div style="min-width: 20%; min-height: 100%; flex-shrink: 0; background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); display: flex; align-items: center; justify-content: center;">
-              <img src="carousel-5.png" alt="Carousel Image 5" id="carousel-img-5" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size: 48px; color: #999;\'>🍽️</span>';">
-            </div>
-          </div>
-          
-          <!-- Left Button -->
-          <button onclick="prevSlide()" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.9); color: ${primaryColor}; border: none; width: 48px; height: 48px; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='rgba(255,255,255,1)'; this.style.transform='translateY(-50%) scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.9)'; this.style.transform='translateY(-50%) scale(1)';">
-            ‹
-          </button>
-          
-          <!-- Right Button -->
-          <button onclick="nextSlide()" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.9); color: ${primaryColor}; border: none; width: 48px; height: 48px; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.background='rgba(255,255,255,1)'; this.style.transform='translateY(-50%) scale(1.1)';" onmouseout="this.style.background='rgba(255,255,255,0.9)'; this.style.transform='translateY(-50%) scale(1)';">
-            ›
-          </button>
-          
-          <!-- Slide Indicators -->
-          <div style="position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px;">
-            ${[0, 1, 2, 3, 4].map(i => `
-              <div style="width: 10px; height: 10px; border-radius: 50%; background: ${i === currentSlide ? 'white' : 'rgba(255, 255, 255, 0.5)'}; transition: all 0.3s ease;"></div>
+      let optionsHtml = '';
+      if (item.options) {
+        optionsHtml = `
+          <div class="mt-3 flex flex-wrap items-center gap-2">
+            <span class="text-green-300 text-sm font-medium">${item.options.label}:</span>
+            ${item.options.choices.map(choice => `
+              <button 
+                class="option-btn px-4 py-2 text-sm rounded-full border-2 border-green-500 text-white hover:bg-green-600 ${currentSelection === choice ? 'selected' : ''}"
+                onclick="selectOption('${itemKey}', '${choice}', event)"
+              >
+                ${choice}
+              </button>
             `).join('')}
           </div>
-        </div>
-      `;
-    }
-
-    function renderHeader(config, fontSize) {
-      const textColor = config.text_color || defaultConfig.text_color;
-      const primaryColor = config.primary_color || defaultConfig.primary_color;
-      const restaurantName = config.restaurant_name || defaultConfig.restaurant_name;
-      const tagline = config.tagline || defaultConfig.tagline;
-      
-      return `
-        <header class="text-center mb-12">
-          <div style="display: flex; align-items: center; justify-content: center; gap: ${fontSize * 1.5}px; margin-bottom: ${fontSize * 0.5}px;">
-            <!-- LOGO IMAGE PLACEHOLDER -->
-            <img src="" alt="Logo" id="header-logo" style="height: ${fontSize * 3.5}px; width: auto; object-fit: contain;" onerror="this.style.display='none';">
-            
-            <h1 style="font-family: 'Ultra', serif; color: ${primaryColor}; font-size: ${fontSize * 3.5}px; font-weight: 400; margin: 0; text-transform: uppercase;">
-              ${restaurantName}
-            </h1>
-            
-            <!-- LOGO IMAGE PLACEHOLDER (duplicate for symmetry) -->
-            <img src="" alt="Logo" id="header-logo-right" style="height: ${fontSize * 3.5}px; width: auto; object-fit: contain;" onerror="this.style.display='none';">
-          </div>
-          <p style="font-family: 'League Spartan', sans-serif; color: ${textColor}; font-size: ${fontSize * 2}px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase;">
-            ${tagline}
-          </p>
-        </header>
-      `;
-    }
-
-    function renderMainCategories(config, fontSize) {
-      let html = '';
-      let categoryIndex = 0;
-      
-      for (const [category, items] of Object.entries(menuData)) {
-        const categoryId = `cat-${categoryIndex}`;
-        html += renderCategory(categoryId, category, items, config, fontSize);
-        categoryIndex++;
+        `;
       }
       
-      return html;
-    }
-
-    function renderBeverages(config, fontSize) {
-      const textColor = config.text_color || defaultConfig.text_color;
-      const primaryColor = config.primary_color || defaultConfig.primary_color;
-      const accentColor = config.accent_color || defaultConfig.accent_color;
-      const categoryId = 'beverages-main';
-      
-      let subHtml = '';
-      let subIndex = 0;
-      
-      for (const [subcategory, items] of Object.entries(beveragesData)) {
-        const subCategoryId = `bev-${subIndex}`;
-        subHtml += renderCategory(subCategoryId, subcategory, items, config, fontSize, true);
-        subIndex++;
+      let descriptionHtml = '';
+      if (item.description) {
+        descriptionHtml = `<p class="text-green-300 text-sm mt-1">${item.description}</p>`;
       }
       
       return `
-        <div class="mb-8">
-          <div class="category-header" onclick="toggleCategory('${categoryId}')" style="background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); padding: 0; min-height: 120px; position: relative; overflow: hidden;">
-            <img src="" alt="Beverages" id="cat-img-${categoryId}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: space-between; padding: 20px; background: ${config.card_color || defaultConfig.card_color};">
-              <h2 style="font-family: 'League Spartan', sans-serif; color: ${primaryColor}; font-size: ${fontSize * 2}px; font-weight: 700;">
-                Beverages
-              </h2>
-              <span id="arrow-${categoryId}" class="dropdown-arrow" style="color: ${accentColor}; font-size: ${fontSize * 2}px;">▼</span>
+        <div class="bg-green-800 rounded-xl p-4 md:p-6 border border-green-700/50 hover:bg-green-700 transition-colors">
+          <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+            <div class="flex-1">
+              <h4 class="text-white font-semibold text-2xl">${item.name}</h4>
+              ${descriptionHtml}
             </div>
+            <span class="text-yellow-400 font-bold text-2xl whitespace-nowrap">${priceDisplay}</span>
           </div>
-          <div id="content-${categoryId}" class="category-content pl-4">
-            ${subHtml}
-          </div>
+          ${optionsHtml}
         </div>
       `;
     }
 
-    function renderCategory(categoryId, categoryName, items, config, fontSize, isSubcategory = false) {
-      const textColor = config.text_color || defaultConfig.text_color;
-      const primaryColor = config.primary_color || defaultConfig.primary_color;
-      const accentColor = config.accent_color || defaultConfig.accent_color;
-      const titleSize = isSubcategory ? fontSize * 1.5 : fontSize * 2;
+    function selectCategory(key) {
+      currentCategory = key;
       
-      return `
-        <div class="mb-8">
-          <div class="category-header" onclick="toggleCategory('${categoryId}')" style="background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%); padding: 0; min-height: 120px; position: relative; overflow: hidden;">
-            <img src="cat-img-${categoryId}.png" alt="${categoryName}" id="cat-img-${categoryId}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <div style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: space-between; padding: 20px; background: ${config.card_color || defaultConfig.card_color};">
-              <h2 style="font-family: 'League Spartan', sans-serif; color: ${primaryColor}; font-size: ${titleSize}px; font-weight: 700;">
-                ${categoryName}
-              </h2>
-              <span id="arrow-${categoryId}" class="dropdown-arrow" style="color: ${accentColor}; font-size: ${fontSize * 2}px;">▼</span>
-            </div>
-          </div>
-          <div id="content-${categoryId}" class="category-content mt-6">
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              ${items.map(item => renderMenuItem(item, config, fontSize)).join('')}
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderFeedbackSection(config, fontSize) {
-      const textColor = config.text_color || defaultConfig.text_color;
-      const primaryColor = config.primary_color || defaultConfig.primary_color;
+      document.getElementById('category-grid').classList.add('hidden');
+      document.getElementById('sidebar-view').classList.remove('hidden');
       
-      return `
-        <div class="text-center mt-16 mb-8">
-          <p style="font-family: 'League Spartan', sans-serif; color: #ffffff; font-size: ${fontSize * 1.5}px; font-weight: 600; margin-bottom: ${fontSize * 1.5}px;">
-            Make Greenhouse 22 better with your feedback!
-          </p>
-          <a href="https://docs.google.com/forms/d/1pso6zc1ePqpl_8lp-gfTJ8TmMVcYZTpNYZbsqTDPEF0/edit" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: ${primaryColor}; color: white; font-family: 'League Spartan', sans-serif; font-size: ${fontSize * 1.1}px; font-weight: 700; padding: ${fontSize * 0.75}px ${fontSize * 2}px; border-radius: 8px; text-decoration: none; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0, 0, 0, 0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.15)';">
-            Customer Satisfaction Survey
-          </a>
-        </div>
-      `;
-    }
-
-    function renderMenuItem(item, config, fontSize) {
-      const textColor = config.text_color || defaultConfig.text_color;
-      const primaryColor = config.primary_color || defaultConfig.primary_color;
-      const accentColor = config.accent_color || defaultConfig.accent_color;
+      renderSidebar();
+      renderMenuItems();
       
-      // Create unique ID from item name (remove spaces and special characters)
-      const itemId = item.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-      
-      let priceDisplay = `₱${item.price}`;
-      if (item.familySize) {
-        priceDisplay = `₱${item.price} / ₱${item.familySize}`;
+      // Scroll to top immediately
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      const appContainer = document.getElementById('app-container');
+      if (appContainer) {
+        appContainer.scrollTop = 0;
       }
-      
-      return `
-        <div class="menu-card" id="img-${itemId}" style="background: ${config.card_color || defaultConfig.card_color};">
-          <div class="menu-card-image">
-            <!-- IMAGE PLACEHOLDER: ${item.name} -->
-            <img src="${itemId}.png" alt="${item.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='🍽️';">
-          </div>
-          <div style="padding: ${fontSize}px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-              <h3 style="color: ${textColor}; font-size: ${fontSize * 1.1}px; font-weight: 700; margin-bottom: ${fontSize * 0.5}px; line-height: 1.3;">
-                ${item.name}
-              </h3>
-              ${item.description ? `
-                <p style="color: #6c757d; font-size: ${fontSize * 0.85}px; margin-bottom: ${fontSize * 0.5}px;">
-                  ${item.description}
-                </p>
-              ` : ''}
-              ${item.options ? `
-                <p style="color: ${accentColor}; font-size: ${fontSize * 0.85}px; margin-bottom: ${fontSize * 0.5}px;">
-                  ${item.options.join(' / ')}
-                </p>
-              ` : ''}
-              ${item.familySize ? `
-                <p style="color: ${accentColor}; font-size: ${fontSize * 0.85}px; margin-bottom: ${fontSize * 0.5}px;">
-                  Regular / Family Size
-                </p>
-              ` : ''}
-            </div>
-            <p style="color: ${primaryColor}; font-size: ${fontSize * 1.3}px; font-weight: 700; margin-top: ${fontSize * 0.5}px;">
-              ${priceDisplay}
-            </p>
-          </div>
-        </div>
-      `;
     }
 
-    initializeApp();
+    function selectOption(itemKey, choice, event) {
+      event.stopPropagation();
+      selectedOptions[itemKey] = selectedOptions[itemKey] === choice ? null : choice;
+      renderMenuItems();
+    }
+
+    function toggleMenu() {
+      const dropdown = document.getElementById('dropdown-menu');
+      dropdown.classList.toggle('hidden');
+    }
+
+    function returnToCategories() {
+      currentCategory = null;
+      document.getElementById('sidebar-view').classList.add('hidden');
+      document.getElementById('category-grid').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const menuToggle = document.getElementById('menu-toggle');
+      const dropdown = document.getElementById('dropdown-menu');
+      
+      if (menuToggle && dropdown && !menuToggle.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    async function onConfigChange(config) {
+      const restaurantName = document.getElementById('restaurant-name');
+      const restaurantTagline = document.getElementById('restaurant-tagline');
+      const appContainer = document.getElementById('app-container');
+      const header = document.getElementById('sticky-header');
+      const baseSize = config.font_size || defaultConfig.font_size;
+
+      if (restaurantName) {
+        restaurantName.textContent = config.restaurant_name || defaultConfig.restaurant_name;
+        restaurantName.style.color = config.accent_color || defaultConfig.accent_color;
+        restaurantName.style.fontSize = `${baseSize * 2}px`;
+      }
+
+      if (restaurantTagline) {
+        restaurantTagline.textContent = config.restaurant_tagline || defaultConfig.restaurant_tagline;
+        restaurantTagline.style.fontSize = `${baseSize * 0.875}px`;
+      }
+
+      if (appContainer) {
+        appContainer.style.backgroundColor = config.background_color || defaultConfig.background_color;
+        appContainer.style.color = config.text_color || defaultConfig.text_color;
+        const customFont = config.font_family || defaultConfig.font_family;
+        appContainer.style.fontFamily = `${customFont}, Arial, sans-serif`;
+        appContainer.style.fontSize = `${baseSize}px`;
+      }
+
+      if (header) {
+        header.style.backgroundColor = (config.header_color || defaultConfig.header_color) + 'f2';
+      }
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              if (window.elementSdk) window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.card_color || defaultConfig.card_color,
+            set: (value) => {
+              config.card_color = value;
+              if (window.elementSdk) window.elementSdk.setConfig({ card_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              if (window.elementSdk) window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.accent_color || defaultConfig.accent_color,
+            set: (value) => {
+              config.accent_color = value;
+              if (window.elementSdk) window.elementSdk.setConfig({ accent_color: value });
+            }
+          },
+          {
+            get: () => config.header_color || defaultConfig.header_color,
+            set: (value) => {
+              config.header_color = value;
+              if (window.elementSdk) window.elementSdk.setConfig({ header_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            if (window.elementSdk) window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            if (window.elementSdk) window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ['restaurant_name', config.restaurant_name || defaultConfig.restaurant_name],
+        ['restaurant_tagline', config.restaurant_tagline || defaultConfig.restaurant_tagline]
+      ]);
+    }
+
+    // Initialize
+    renderCategoryGrid();
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bb2183fc32c8d0f',t:'MTc2Nzk0MjQxNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bebdc62c09f9d21',t:'MTc2ODU0ODEzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
