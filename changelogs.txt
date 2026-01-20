@@ -1,6 +1,6 @@
 Changelogs
 
-v1.0.1
+v1.0.1-2
 - Fixed return button in mobile version, now returns to Categories Selection instead of exiting the whole page. Pressing return in Categories Selection will now cause the page to exit.
 - Added a "Press To Call Us" button in Socials sections that when pressed, directs to phone dial with number embedded.
 - Made the phone number in the footer be clickable, same behavior as above.
