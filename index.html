@@ -285,7 +285,7 @@
     and I wish Greenhouse 22
     the prosperity it deserves :) -->
    <footer class="border-t border-green-300 mt-12 py-6 text-center text-green-600 text-sm">
-    <p>© 2026 Greenhouse 22 • Fishing Station &amp; Restaurant<br>Purok Sweet Rose, Brgy. Dumagoc, Pagadian City<br>0977-750-5800</p>
+    <p>© 2026 Greenhouse 22 • Fishing Station &amp; Restaurant<br>Purok Sweet Rose, Brgy. Dumagoc, Pagadian City<br>0977-750-5800<br>v.1</p>
    </footer>
   </div>
   <script>
@@ -706,20 +706,22 @@
     }
 
     function selectCategory(key) {
-      currentCategory = key;
-      
-      document.getElementById('category-grid').classList.add('hidden');
-      document.getElementById('sidebar-view').classList.remove('hidden');
-      
-      renderSidebar();
-      renderMenuItems();
-      
-      // Scroll to top immediately
-      window.scrollTo({ top: 0, behavior: 'instant' });
-      const appContainer = document.getElementById('app-container');
-      if (appContainer) {
-        appContainer.scrollTop = 0;
-      }
+  currentCategory = key;
+
+  // Push state to browser history
+  history.pushState(
+    { view: 'category', category: key },
+    '',
+    `#${key}`
+  );
+
+  document.getElementById('category-grid').classList.add('hidden');
+  document.getElementById('sidebar-view').classList.remove('hidden');
+
+  renderSidebar();
+  renderMenuItems();
+
+  window.scrollTo({ top: 0, behavior: 'instant' });
     }
 
     function selectOption(itemKey, choice, event) {
@@ -734,10 +736,15 @@
     }
 
     function returnToCategories() {
-      currentCategory = null;
-      document.getElementById('sidebar-view').classList.add('hidden');
-      document.getElementById('category-grid').classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+  history.pushState({ view: 'categories' }, '', '#categories');
+  showCategories();
+    }
+
+    function showCategories() {
+  currentCategory = null;
+  document.getElementById('sidebar-view').classList.add('hidden');
+  document.getElementById('category-grid').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // Close dropdown when clicking outside
@@ -848,6 +855,14 @@
     // Initialize
     renderCategoryGrid();
 
+    window.addEventListener('popstate', (event) => {
+  if (!event.state || event.state.view === 'categories') {
+    showCategories();
+  } else if (event.state.view === 'category') {
+    selectCategory(event.state.category);
+  }
+});
+
     if (window.elementSdk) {
       window.elementSdk.init({
         defaultConfig,
@@ -860,7 +875,6 @@
  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bebdc62c09f9d21',t:'MTc2ODU0ODEzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 
 </html>
-
 
 
 
