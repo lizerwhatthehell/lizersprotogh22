@@ -285,7 +285,7 @@
     and I wish Greenhouse 22
     the prosperity it deserves :) -->
    <footer class="border-t border-green-300 mt-12 py-6 text-center text-green-600 text-sm">
-    <p>© 2026 Greenhouse 22 • Fishing Station &amp; Restaurant<br>Purok Sweet Rose, Brgy. Dumagoc, Pagadian City<br><a href="tel:+639777505800">0977-750-5800</a><br><a href="changelog.txt">v0.0.1-hotfix2</a></p>
+    <p>© 2026 Greenhouse 22 • Fishing Station &amp; Restaurant<br>Purok Sweet Rose, Brgy. Dumagoc, Pagadian City<br>0977-750-5800</p>
    </footer>
   </div>
   <script>
@@ -706,14 +706,25 @@
     }
 
     function selectCategory(key) {
+  const isFirstCategory = currentCategory === null;
+
   currentCategory = key;
 
-  // Push state to browser history
-  history.pushState(
-    { view: 'category', category: key },
-    '',
-    `#${key}`
-  );
+  if (isFirstCategory) {
+    // Entering menu for the first time
+    history.pushState(
+      { view: 'category' },
+      '',
+      '#menu'
+    );
+  } else {
+    // Switching categories — do NOT add history
+    history.replaceState(
+      { view: 'category' },
+      '',
+      '#menu'
+    );
+  }
 
   document.getElementById('category-grid').classList.add('hidden');
   document.getElementById('sidebar-view').classList.remove('hidden');
@@ -722,7 +733,7 @@
   renderMenuItems();
 
   window.scrollTo({ top: 0, behavior: 'instant' });
-    }
+}
 
     function selectOption(itemKey, choice, event) {
       event.stopPropagation();
@@ -854,13 +865,10 @@
 
     // Initialize
     renderCategoryGrid();
+    history.replaceState({ view: 'categories' }, '', '#categories');
 
-    window.addEventListener('popstate', (event) => {
-  if (!event.state || event.state.view === 'categories') {
-    showCategories();
-  } else if (event.state.view === 'category') {
-    selectCategory(event.state.category);
-  }
+    window.addEventListener('popstate', () => {
+  showCategories();
 });
 
     if (window.elementSdk) {
@@ -875,7 +883,6 @@
  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9bebdc62c09f9d21',t:'MTc2ODU0ODEzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 
 </html>
-
 
 
 
